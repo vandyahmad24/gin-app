@@ -5,12 +5,15 @@ import (
 	"github.com/vandyahmad24/gin-app/config"
 	"github.com/vandyahmad24/gin-app/controller"
 	"github.com/vandyahmad24/gin-app/entity/user"
+	"github.com/vandyahmad24/gin-app/lib"
 )
 
 func Router() {
 	userRepository := user.NewRepository(config.DB)
 	userService := user.NewService(userRepository)
-	userHandler := controller.NewUserHandler(userService)
+	authService := lib.NewService()
+	userHandler := controller.NewUserHandler(userService, authService)
+
 	// userService.SaveAvatar(21, "main.jpg")
 
 	r := gin.Default()

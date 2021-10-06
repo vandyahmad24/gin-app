@@ -7,14 +7,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vandyahmad24/gin-app/entity/user"
 	"github.com/vandyahmad24/gin-app/helper"
+	"github.com/vandyahmad24/gin-app/lib"
 )
 
 type userHandler struct {
 	userService user.Service
+	authService lib.AuthService
 }
 
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService lib.AuthService) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
@@ -31,6 +33,7 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+	// cek email terlebih dahulu
 
 	newUser, err := h.userService.RegisterUser(input)
 
@@ -39,8 +42,15 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+	// tokennya
+	token, err := h.authService.GenerateToken(newUser.ID)
+	if err != nil {
+		response := helper.APIResponse("Register account failed", http.StatusBadRequest, "error", err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
 
-	formatter := user.FormatUser(newUser, "Belum ada")
+	formatter := user.FormatUser(newUser, token)
 
 	response := helper.APIResponse("Account has been registered", http.StatusOK, "success", formatter)
 
@@ -72,8 +82,16 @@ func (h *userHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+	// tokennya
+	// tokennya
+	token, err := h.authService.GenerateToken(loginUser.ID)
+	if err != nil {
+		response := helper.APIResponse("Register account failed", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
 
-	formatter := user.FormatUser(loginUser, "belum ada token")
+	formatter := user.FormatUser(loginUser, token)
 	response := helper.APIResponse("Success Login User", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 
