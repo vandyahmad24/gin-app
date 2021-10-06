@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vandyahmad24/gin-app/entity/user"
 	"github.com/vandyahmad24/gin-app/helper"
-	"github.com/vandyahmad24/gin-app/user"
 )
 
 type userHandler struct {
@@ -75,5 +75,42 @@ func (h *userHandler) Login(c *gin.Context) {
 	formatter := user.FormatUser(loginUser, "belum ada token")
 	response := helper.APIResponse("Success Login User", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
+
+}
+
+func (h *userHandler) CheckEmailIsUse(c *gin.Context) {
+	// ada input email dari user
+	// input email dimapping ke struct input
+	// struct input di passwing ke service
+	// service akan manggil repository apakah ada atau tidak emailnya
+	//  repository db
+	var input user.CekEmailInput
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Email checking errors", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	isEmailAvailable, err := h.userService.CekEmail(input)
+	if err != nil {
+		errorMessage := gin.H{"errors": "Server error"}
+		response := helper.APIResponse("Email checking errors", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{
+		"is_available": isEmailAvailable,
+	}
+	metaMessage := "Email has been registered"
+	if isEmailAvailable {
+		metaMessage = "Email is available"
+	}
+	response := helper.APIResponse(metaMessage, http.StatusOK, "success", data)
+	c.JSON(http.StatusOK, response)
+	return
 
 }

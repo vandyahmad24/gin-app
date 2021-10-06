@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vandyahmad24/gin-app/config"
 	"github.com/vandyahmad24/gin-app/controller"
-	"github.com/vandyahmad24/gin-app/user"
+	"github.com/vandyahmad24/gin-app/entity/user"
 )
 
 func Router() {
@@ -16,5 +16,6 @@ func Router() {
 	api := r.Group("api/v1")
 	api.POST("/register", userHandler.RegisterUser)
 	api.POST("/login", userHandler.Login)
+	api.POST("/email_checkers", userHandler.CheckEmailIsUse)
 	r.Run(":9191")
 }
