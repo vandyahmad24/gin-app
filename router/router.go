@@ -24,3 +24,21 @@ func Router() {
 	api.POST("/avatars", userHandler.UploadAvatar)
 	r.Run(":9191")
 }
+
+// func authMiddleware(c *gin.Context) {
+// 	authHeader := c.GetHeader("Authorization")
+// 	if !strings.Contains(authHeader, "Bearer") {
+// 		// ressponseMessage := gin.H{}
+// 		response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+// 		c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+// 		return
+// 	}
+// 	tokenString := ""
+// 	arrayToken := strings.Split(authHeader, " ")
+// 	if len(arrayToken) == 2 {
+// 		tokenString = arrayToken[1]
+// 	}
+
+// 	token, err :=
+
+// }
